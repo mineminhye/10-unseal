@@ -60,8 +60,12 @@
   #win.on #winLine{animation:lineIn 1.6s ease 2.1s forwards;}
   @keyframes lineIn{from{opacity:0;transform:translateX(-50%) translateY(-14px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
   #win .foot{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);display:flex;gap:.8em;flex-wrap:wrap;justify-content:center;width:min(94vw,900px);}
-  #howto{position:absolute;left:50%;top:62px;transform:translateX(-50%);z-index:5;max-width:min(88vw,780px);text-align:center;font-size:.52em;line-height:1.45;color:#f2ecd8;background:rgba(10,12,24,.64);border:1px solid rgba(216,180,90,.4);border-radius:14px;padding:.55em 1em;pointer-events:none;text-shadow:0 2px 6px #000;}
+  #howto{position:absolute;z-index:5;color:#f4eeda;background:rgba(10,12,24,.72);border:1px solid rgba(216,180,90,.45);border-radius:16px;pointer-events:none;text-shadow:0 2px 6px #000;box-shadow:0 8px 24px rgba(0,0,0,.4);}
   #howto b{color:var(--gold-l);}
+  /* 데스크톱(가로): 왼쪽 세로 배치, 화면 중앙(원판) 안 가림 */
+  #howto{left:1.5%;top:50%;transform:translateY(-50%);width:min(22vw,280px);font-size:.64em;line-height:1.5;padding:.9em 1.05em;text-align:left;}
+  /* 모바일/세로 화면: 위쪽 가로 배너 */
+  @media (max-aspect-ratio:1/1){ #howto{left:50%;top:12px;transform:translateX(-50%);width:92vw;max-width:640px;font-size:.62em;line-height:1.4;padding:.6em 1em;text-align:center;} }
   #soundBtn{position:fixed;left:16px;bottom:16px;z-index:40;width:2em;height:2em;padding:0;border:none;border-radius:12px;cursor:pointer;font-size:.9em;line-height:1;background:rgba(20,20,34,.6);border:1px solid rgba(216,180,90,.4);color:#fff;display:flex;align-items:center;justify-content:center;}
   @media (max-width:640px){:root{--fs:22px;}}
 </style>
@@ -266,7 +270,10 @@ function switchTo(a){
   if(curBgm===a){ if(!muted&&a&&a.getAttribute('src')) safePlay(a); return; }
   const prev=curBgm; curBgm=a;
   if(prev) fadeVol(prev,0,600,()=>prev.pause());
-  if(a&&a.getAttribute('src')&&!muted){ a.volume=0; safePlay(a,()=>fadeVol(a,0.7,800)); }
+  if(a&&a.getAttribute('src')&&!muted){
+    if(prev){ a.volume=0.4; safePlay(a,()=>fadeVol(a,0.75,500)); }   // 곡 전환: 바로 들리게 시작
+    else { a.volume=0.7; safePlay(a); }                             // 첫 시작: 바로 재생
+  }
 }
 $('#soundBtn').onclick=()=>{ muted=!muted; $('#soundBtn').textContent=muted?'🔇':'🔊';
   if(muted){ if(curBgm)curBgm.pause(); } else if(curBgm&&curBgm.getAttribute('src')){ curBgm.volume=0.7; safePlay(curBgm); } };
@@ -289,7 +296,7 @@ function spawnStars(){
     box.appendChild(s);
   }
 }
-$('#startBtn').onclick=startGame;
+$('#startBtn').onclick=()=>{ switchTo(bgm); startGame(); };
 $('#pauseBtn').onclick=()=>{paused=true;$('#pauseOv').classList.add('on');};
 $('#resumeBtn').onclick=()=>{paused=false;$('#pauseOv').classList.remove('on');};
 $('#restartBtn').onclick=()=>{paused=false;$('#pauseOv').classList.remove('on');startGame();};
